@@ -41,9 +41,9 @@ let persons = [
   },
 ];
 
-app.get("/", (request, response) => {
-  response.end("<h1>This is persons backend API</h1>");
-});
+// app.get("/", (request, response) => {
+//   response.end("<h1>This is persons backend API</h1>");
+// });
 
 app.get("/api/persons", (request, response) => {
   response.json(persons);
