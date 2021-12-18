@@ -6,7 +6,11 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:ui": "rm -rf build && cd ../part2/ex2_forms && npm run build && cp -r build ../../ex_personsbackend/",
+    "deploy": "git push heroku master",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push origin master && npm run deploy",
+    "logs:prod": "heroku logs --app secure-journey-23480 --tail"
   },
   "repository": {
     "type": "git",
