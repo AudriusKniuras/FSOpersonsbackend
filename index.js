@@ -27,28 +27,40 @@ app.get("/api/persons", (request, response) => {
   Person.find({}).then((p) => response.json(p));
 });
 
-// app.get("/info", (request, response) => {
-//   response.end(
-//     `<p>Phonebook has info for ${persons.length} people</p><p>${Date()}</p>`
-//   );
-// });
-
-app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const person = persons.find((p) => p.id === id);
-
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
+app.get("/info", (request, response, next) => {
+  Person.count({})
+    .then((result) => {
+      if (result) {
+        response.end(
+          `<p>Phonebook has info for ${result} people</p><p>${Date()}</p>`
+        );
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch((error) => {
+      next(error);
+    });
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  persons = persons.filter((person) => person.id !== id);
+app.get("/api/persons/:id", (request, response) => {
+  Person.findById(request.params.id)
+    .then((p) => {
+      if (p) {
+        response.json(p);
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch((error) => {
+      next(error);
+    });
+});
 
-  response.status(204).end();
+app.delete("/api/persons/:id", (request, response, next) => {
+  Person.findByIdAndDelete(request.params.id)
+    .then((result) => response.status(204).end())
+    .catch((error) => next(error));
 });
 
 app.post("/api/persons", (request, response) => {
@@ -62,10 +74,6 @@ app.post("/api/persons", (request, response) => {
       error: "number missing",
     });
   }
-  // Person.find({ name: body.name }).then((result) => {
-  //   return response.status(409).json({ error: "Name already exists" });
-  // });
-  console.log(Person.find({name: body.name}));
 
   const person = new Person({
     name: body.name,
@@ -74,6 +82,33 @@ app.post("/api/persons", (request, response) => {
 
   person.save().then((savedPerson) => response.json(savedPerson));
 });
+
+app.put("/api/persons/:id", (request, response, next) => {
+  const body = request.body;
+
+  const person = {
+    number: body.number,
+  };
+
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then((updatedPerson) => {
+      response.json(updatedPerson);
+    })
+    .catch((error) => {
+      next(error);
+    });
+});
+
+const errorHandler = (error, request, response, next) => {
+  console.log(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "Malformed id" });
+  }
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

@@ -2,11 +2,11 @@ GET http://localhost:3001/api/persons
 
 ###
 
-GET http://localhost:3001/api/persons/1
+GET http://localhost:3001/api/persons/61bef41feab98beeddb102ee
 
 ###
 
-DELETE http://localhost:3001/api/persons/5
+DELETE http://localhost:3001/api/persons/61bf1ee16af4ba2fea1fa130
 
 ###
 
@@ -15,5 +15,14 @@ content-type: application/json
 
     {
       "name": "Audrius8",
-      "number": "555-444"
+      "number": "444-444"
     }
+
+###
+
+PUT http://localhost:3001/api/persons/61bef41feab98beeddb102ee
+Content-Type: application/json
+
+  {
+    "number": "123-456"
+  }
